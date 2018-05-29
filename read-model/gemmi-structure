@@ -1,0 +1,5 @@
+#!/usr/bin/python3
+
+import sys
+import gemmi
+st = gemmi.read_structure(sys.argv[1])
