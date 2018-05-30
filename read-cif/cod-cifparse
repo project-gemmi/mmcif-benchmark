@@ -1,0 +1,1 @@
+exec $COD_TOOLS/src/components/codcif/cifparse --quiet $1

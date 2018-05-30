@@ -1,0 +1,7 @@
+#!/usr/bin/env ccp4-python
+
+import sys
+import clipper
+
+f = clipper.MMDBfile()
+f.read_file(sys.argv[1])

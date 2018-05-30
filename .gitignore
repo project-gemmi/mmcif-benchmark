@@ -1,2 +1,4 @@
 *.cif
 *.ent
+alt/*.json
+alt/*.mmtf

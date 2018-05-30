@@ -1,0 +1,11 @@
+#!/usr/bin/python3
+
+import sys
+from Bio.PDB import MMCIFParser
+
+# avoid warnings such as "Chain A is discontinuous at line 7333."
+import warnings
+from Bio import BiopythonWarning
+warnings.simplefilter('ignore', BiopythonWarning)
+
+MMCIFParser().get_structure('id', sys.argv[1])

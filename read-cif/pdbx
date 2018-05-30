@@ -1,0 +1,8 @@
+#!/usr/bin/python3
+
+import sys
+from pdbx.reader.PdbxReader import PdbxReader
+with open(sys.argv[1]) as cif_fh:
+    data = []
+    reader = PdbxReader(cif_fh)
+    reader.read(data)

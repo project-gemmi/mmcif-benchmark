@@ -1,0 +1,1 @@
+exec cif2_syncheck -f $1 >/dev/null 2>&1

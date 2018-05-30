@@ -1,0 +1,7 @@
+#!/usr/bin/python3
+
+import sys
+import json
+
+with open(sys.argv[1]) as f:
+    json.load(f)

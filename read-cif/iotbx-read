@@ -1,0 +1,7 @@
+#!/usr/bin/env ccp4-python
+
+import sys
+import clipper
+
+import iotbx.cif
+iotbx.cif.reader(file_path=sys.argv[1])
