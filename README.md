@@ -103,9 +103,6 @@ Just for comparison:
   [1cjb mmJSON](https://pdbj.org/rest/downloadPDBfile?id=1CJB&format=mmjson-all)
   with Python built-in parser takes 0.03s (17MB).
 
-And if you are interested in parsing small CIF files this benchmark
-is more relevant: https://github.com/cod-developers/CIF-parsers
-
 ## Creating a structural model
 
 Here we benchmark reading coordinate mmCIF files
@@ -139,3 +136,11 @@ Here I use only two of them: 1cjb.cif and 3j3q.cif:
 | `iotbx-pdb`           | 0.40 | 110  |  ERR  |       |
 
 The table reports elapsed time in seconds and peak memory in MB.
+
+## Other benchmarks
+
+Parsing small CIF files: https://github.com/cod-developers/CIF-parsers
+
+Parsing PDB files: https://github.com/jgreener64/pdb-benchmarks  
+(it doesn't include Gemmi, but parsing 1HTQ PDB file in Gemmi takes
+about 0.5s, it's 3-4x faster than parsing corresponding mmCIF file).
