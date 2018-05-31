@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
 import sys
-from Bio.PDB.mmtf import MMTFParser
+import mmtf
 
-MMTFParser().get_structure(sys.argv[1])
+decoded = mmtf.parse(sys.argv[1])
