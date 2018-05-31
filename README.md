@@ -22,7 +22,7 @@ I used two entries from
 [MMTF benchmark](https://github.com/rcsb/mmtf-python-benchmark/):
 4fxz (428KB) and 1cjb (836KB) that represent structures around the 50
 and 75 percentile of the PDB size distribution
-(no. 50 from corresponding `sample_NN.csv` file there).
+(no. 50 from the corresponding `sample_NN.csv` files there).
 
 The data files can be downloaded from wwPDB:
 
@@ -34,6 +34,9 @@ The data files can be downloaded from wwPDB:
     wget $DATA/structures/divided/mmCIF/cj/1cjb.cif.gz
     gunzip *.gz
 
+Note: benchmarks made by an author of one of the benchmarked programs
+are always suspicious. This benchmark was prepared by the author of
+[Gemmi](https://project-gemmi.github.io/).
 
 ## CIF parsing
 
@@ -51,7 +54,8 @@ The scripts that are run are in the ``read-cif`` subdirectory:
 * `cif_api_fast` - the same, but with the `-f` option (does not create DOM)
 * `cod-cifparse` - runs `cifparse`
   from [cod-tools](https://github.com/cod-developers/cod-tools)
-* `iotbx-read` - calls `iotbx.cif.reader()` from cctbx/iotbx (Python)
+* `iotbx-read` - calls `iotbx.cif.reader()` from 
+  [cctbx/iotbx](https://cctbx.github.io/iotbx/) (Python)
 * `pdbx` -
   [pdbx module](http://mmcif.wwpdb.org/docs/sw-examples/python/html/index.html)
   is a Python parser from RCSB PDB.
@@ -64,7 +68,7 @@ The benchmark was run using the `run.sh` script from this repository:
 Each combination of script/program and cif file was timed 10 times
 and the fastest time was reported.
 The benchmark was run on a Linux system, CPU i7-4790, 16GB RAM with
- 12GB limit on the program memory (`ulimit -v 12582912`).
+12GB limit on the program memory (`ulimit -v 12582912`).
 The libraries were compiled with GCC 5 with default options (-O2 or -O3),
 or installed from binaries (iotbx).
 
@@ -96,30 +100,36 @@ OOM = out-of-memory error
 | `iotbx-read`          | 98.0 | 118.2 |  OOM  |  8768   |  9320 |
 | `pdbx`                | 14.4 |  18.6 |  2895 |  1821   |  2353 |
 
-Just for comparison:
-* parsing [1cjb MMTF file](http://mmtf.rcsb.org/v1.0/full/1cjb.mmtf.gz)
-  with Python parser takes 0.26s (47MB mem),
+For comparison (scripts in the `alt` subdirectory):
+* decoding [1cjb MMTF file](http://mmtf.rcsb.org/v1.0/full/1cjb.mmtf.gz)
+  with [mmtf-python](https://github.com/rcsb/mmtf-python) takes 0.11s
+  (32MB of memory),
 * parsing
   [1cjb mmJSON](https://pdbj.org/rest/downloadPDBfile?id=1CJB&format=mmjson-all)
-  with Python built-in parser takes 0.03s (17MB).
+  with Python built-in parser takes 0.03s (17MB of memory).
 
 ## Creating a structural model
 
-Here we benchmark reading coordinate mmCIF files
+Here we benchmark reading
+[coordinate mmCIF files](http://gemmi.readthedocs.io/en/latest/mol.html#pdbx-mmcif-format)
 and interpreting their content as a structural model,
-which may involve building a model-chain-residue-atom hierarchy.
+which usually involves building a model-chain-residue-atom hierarchy.
 
 The scripts that are run are in the ``read-model`` subdirectory.
 They happen to all be Python scripts:
 
 * `gemmi-structure` - calls `gemmi.read_structure()` from Python.
   Internally, it first copies all the data into DOM structure, and then
-  reads it to create a Model-Chain-Residue-Atom hierarchy (copying the data
-  again).
+  creates a hierarchy copying the data again.
 * `biopython` - calls `MMCIFParser().get_structure()`
+  from [BioPython](https://biopython.org/)
 * `biopython-fast` - calls `FastMMCIFParser().get_structure()`
-* `clipper-python` - calls `clipper.MMDBfile().read_file()`
-* `iotbx-pdb` - calls `iotbx.pdb.input()`
+  (BioPython has two parsers - only the slower one aims
+  to parse mmCIF files correctly)
+* `clipper-python` - calls `clipper.MMDBfile().read_file()` from
+  [clipper-python](https://github.com/clipper-python/clipper-python)
+* `iotbx-pdb` - calls `iotbx.pdb.input()` from
+  [cctbx/iotbx](https://cctbx.github.io/iotbx/)
 
 These benchmarks can be run only with coordinate files.
 Here I use only two of them: 1cjb.cif and 3j3q.cif:
@@ -137,6 +147,9 @@ Here I use only two of them: 1cjb.cif and 3j3q.cif:
 
 The table reports elapsed time in seconds and peak memory in MB.
 
+For comparison:
+* parsing 1cjb MMTF file with BioPython parser takes 0.26s and 47MB mem.
+
 ## Other benchmarks
 
 Parsing small CIF files: https://github.com/cod-developers/CIF-parsers
@@ -144,3 +157,10 @@ Parsing small CIF files: https://github.com/cod-developers/CIF-parsers
 Parsing PDB files: https://github.com/jgreener64/pdb-benchmarks  
 (it doesn't include Gemmi, but parsing 1HTQ PDB file in Gemmi takes
 about 0.5s, it's 3-4x faster than parsing corresponding mmCIF file).
+
+## Thoughts
+
+mmJSON would be the format of choice in computing if it was one of the
+formats supported by the wwPDB. Currently wwPDB provides coordinates in
+3 formats: PDBx/mmCIF (master format), PDB (legacy format)
+and PDBML (XML-based one).
