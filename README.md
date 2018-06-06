@@ -79,7 +79,7 @@ or installed from binaries (iotbx).
 | `gemmi-read`          | 0.02 | 0.03 |  2.80 |    2.73 |   2.90 |
 | `gemmi-validate`      | 0.00 | 0.01 |  2.71 |    2.66 |   2.88 |
 | `gemmi-validate-fast` | 0.00 | 0.00 |  1.33 |    1.16 |   1.14 |
-| `cif_api`             | 2.25 | 4.78 |  ages |   ages  |        |
+| `cif_api`             | 2.25 | 4.78 | > hour|  635.63 | 587.00 |
 | `cif_api_fast`        | 0.01 | 0.02 |  5.99 |    4.36 |   5.90 |
 | `cod-cifparse`        | 0.03 | 0.07 | 26.58 |   15.81 |  13.86 |
 | `iotbx-read`          | 0.26 | 0.31 |  OOM  |   22.34 | 118.40 |
@@ -94,7 +94,7 @@ OOM = out-of-memory error
 | `gemmi-read`          | 17.4 |  21.4 |  2287 |  2321   |  1726 |
 | `gemmi-validate`      |  9.5 |  12.9 |  2279 |  2313   |  1717 |
 | `gemmi-validate-fast` |  3.9 |   3.8 |   237 |   254   |   241 |
-| `cif_api`             |  9.3 |   9.2 |   x   |  x      | x     |
+| `cif_api`             |  9.3 |   9.2 |    10 |     9   |     9 |
 | `cif_api_fast`        |  5.2 |   5.2 |     7 |     5   |     5 |
 | `cod-cifparse`        |  8.8 |  15.7 |  3985 |  2835   |  3100 |
 | `iotbx-read`          | 98.0 | 118.2 |  OOM  |  8768   |  9320 |
