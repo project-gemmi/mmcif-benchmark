@@ -1,0 +1,8 @@
+#!/usr/bin/python3
+
+import sys
+from Bio.PDB import MMCIFParser
+
+st = MMCIFParser().get_structure('id', sys.argv[1])
+model = st[0]
+print(len(model))
