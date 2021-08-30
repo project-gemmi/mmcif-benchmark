@@ -1,0 +1,5 @@
+#!/usr/bin/python3.8
+
+import sys
+import pycodcif
+dom = pycodcif.parse(sys.argv[1])

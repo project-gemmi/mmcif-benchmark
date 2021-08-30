@@ -1,0 +1,6 @@
+#!/usr/bin/python3.8
+
+import sys
+from pdbecif.mmcif_io import CifFileReader
+
+data = CifFileReader().read(sys.argv[1])

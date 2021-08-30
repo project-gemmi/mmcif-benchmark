@@ -1,0 +1,6 @@
+#!/usr/bin/python3.8
+
+import sys
+from mmcif.io.IoAdapterCore import IoAdapterCore
+reader = IoAdapterCore()
+data = reader.readFile(sys.argv[1])

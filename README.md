@@ -9,16 +9,12 @@ wwPDB provides three kinds of PDBx/mmCIF files:
 
 How quickly these files can be parsed?
 
-As of May 2018 `components.cif` has 247,493,093 bytes.
-The largest coordinate file is slightly smaller:
-3j3q.cif  has 241,631,935 bytes.
-To make the numbers easy to compare I used a script
-(`find_similar.py` from this repo) to find a SF file that is also similar
-in size to `components.cif`. 4v9p has 260,351,280 bytes (the biggest
-SF file - 6cgv - is 50% bigger).
+For big files, we test `components.cif` from Aug 2021 - 327 MB,
+coordinate file 3j3q.cif - 230 MB,
+and reflection file 4v9p - 248 MB.
 
-All these files are pretty big. To add more representative files
-I used two entries from
+These three files are pretty big (although the PDB has 10x bigger SF-mmCIF
+files). To add more representative files I used two entries from
 [MMTF benchmark](https://github.com/rcsb/mmtf-python-benchmark/):
 4fxz (428KB) and 1cjb (836KB) that represent structures around the 50
 and 75 percentile of the PDB size distribution
@@ -44,21 +40,27 @@ In this section I benchmarked function calls and helper programs that work
 with CIF files on the syntactic level. The programs do different things,
 so I compare apples to oranges, but it gives you some idea what to expect.
 
-The scripts that are run are in the ``read-cif`` subdirectory:
+The scripts used here are in the ``read-cif`` subdirectory.
+They either call commands:
 
-* `gemmi-read` - reads the CIF file from Python
-* `gemmi-validate-fast` - only parses a file w/o copying any data
 * `gemmi-validate` - parses and copies all the data into a DOM structure
+* `gemmi-validate-fast` - parses a file w/o copying any data
 * `cif_api` - runs `cif2_syncheck` from cif_api, as in a benchmark in
   [this paper](http://dx.doi.org/10.1107/S1600576715021883).
 * `cif_api_fast` - the same, but with the `-f` option (does not create DOM)
-* `cod-cifparse` - runs `cifparse`
-  from [cod-tools](https://github.com/cod-developers/cod-tools)
-* `iotbx-read` - calls `iotbx.cif.reader()` from 
+
+or are Python scripts:
+
+* `gemmi-read` - reads the CIF file from Python
+* `pycodcif` - runs `parse` from [pycodcif](https://github.com/merkys/pycodcif)
+* `iotbx-read` - calls `iotbx.cif.reader()` from
   [cctbx/iotbx](https://cctbx.github.io/iotbx/) (Python)
-* `pdbx` -
-  [pdbx module](http://mmcif.wwpdb.org/docs/sw-examples/python/html/index.html)
-  is a Python parser from RCSB PDB.
+* `py-mmcif` - reads using mmcif.io.PdbxReader
+  from [py-mmcif](https://github.com/rcsb/py-mmcif) (developed at RCSB)
+* `py-mmcif-iab` - reads using mmcif.io.IoAdapterCore
+  from [py-mmcif](https://github.com/rcsb/py-mmcif)
+* `pdbecif` - uses Python parser from
+  [pdbecif](https://github.com/PDBeurope/pdbecif) (developed at PDBe).
 
 
 The benchmark was run using the `run.sh` script from this repository:
@@ -69,36 +71,25 @@ Each combination of script/program and cif file was timed 10 times
 and the fastest time was reported.
 The benchmark was run on a Linux system, CPU i7-4790, 16GB RAM with
 12GB limit on the program memory (`ulimit -v 12582912`).
-The libraries were compiled with GCC 5 with default options (-O2 or -O3),
-or installed from binaries (iotbx).
+The libraries were installed from binaries (mostly from PyPI)
+or compiled with GCC 7 with default options (-O2 or -O3).
 
-### Run time (seconds)
+### Run time (seconds) and peak memory (MB)
 
-|       program         | 4fxz | 1cjb | 3j3q  | r4v9psf |  CCD   |
-| --------------------- | ---: | ---: | ----: | ------: | -----: |
-| `gemmi-read`          | 0.02 | 0.03 |  2.80 |    2.73 |   2.90 |
-| `gemmi-validate`      | 0.00 | 0.01 |  2.71 |    2.66 |   2.88 |
-| `gemmi-validate-fast` | 0.00 | 0.00 |  1.33 |    1.16 |   1.14 |
-| `cif_api`             | 2.25 | 4.78 | > hour|  635.63 | 587.00 |
-| `cif_api_fast`        | 0.01 | 0.02 |  5.99 |    4.36 |   5.90 |
-| `cod-cifparse`        | 0.03 | 0.07 | 26.58 |   15.81 |  13.86 |
-| `iotbx-read`          | 0.26 | 0.31 |  OOM  |   22.34 | 118.40 |
-| `pdbx`                | 0.11 | 0.19 | 51.28 |   45.40 |  47.92 |
+|       program         | 4fxz | mem  | 1cjb | mem   | 3j3q  | mem   | r4v9psf | mem   |  CCD   | mem   |
+| --------------------- | ---: | ---: | ---: | ----: | ----: | ----: | ------: | ----: | -----: | ----: |
+| `gemmi-validate`      | 0.01 |  8.5 | 0.01 |  13.0 |  5.0  | 2278  |    3.6  | 2312  |   5.1  | 2331  |
+| `gemmi-validate-fast` | 0.00 |  4.3 | 0.00 |   4.4 |  1.7  |  237  |    1.5  |  254  |   2.0  |  334  |
+| `cif_api`             | 2.4  |  9.8 | 5.20 |   9.8 | > hour|   10  |  635.6  |    9  | 587.0  |    9  |
+| `cif_api_fast`        | 0.01 |  6.2 | 0.02 |   6.1 |  7.4  |  7.7  |    5.2  |    6  |   9.4  |    6  |
+| `gemmi-read`          | 0.17 | 42.0 | 0.18 |  47.0 |  7.8  | 3369  |    6.0  | 2493  |   8.3  | 3207  |
+| `pycodcif`            | 0.27 | 34.0 | 0.52 |  58.0 |  OOM  |       |  111.3  | 9851  |  OOM   |       |
+| `iotbx-read`          | 0.34 | 98.0 | 0.40 | 120.0 |  OOM  |       |   28.5  | 8771  |  OOM   |       |
+| `py-mmcif`            | 0.16 | 20.9 | 0.26 |  25.6 | 65.5  | 3217  |   55.3  | 1939  |  72.8  | 3291  |
+| `py-mmcif-iab`        | 0.11 | 26.7 | 0.16 |  35.8 | 38.7  | 6008  |   26.1  | 3897  |  53.6  | 6535  |
+| `pdbecif`             | 0.05 | 14.9 | 0.07 |  18.9 | 15.6  | 3025  |   11.1  | 1942  |  41.6  | 2671  |
 
 OOM = out-of-memory error
-
-### Peak memory (MB)
-
-|       program         | 4fxz | 1cjb  | 3j3q  | r4v9psf |  CCD  |
-| --------------------- | ---: | ----: | ----: | ------: | ----: |
-| `gemmi-read`          | 17.4 |  21.4 |  2287 |  2321   |  1726 |
-| `gemmi-validate`      |  9.5 |  12.9 |  2279 |  2313   |  1717 |
-| `gemmi-validate-fast` |  3.9 |   3.8 |   237 |   254   |   241 |
-| `cif_api`             |  9.3 |   9.2 |    10 |     9   |     9 |
-| `cif_api_fast`        |  5.2 |   5.2 |     7 |     5   |     5 |
-| `cod-cifparse`        |  8.8 |  15.7 |  3985 |  2835   |  3100 |
-| `iotbx-read`          | 98.0 | 118.2 |  OOM  |  8768   |  9320 |
-| `pdbx`                | 14.4 |  18.6 |  2895 |  1821   |  2353 |
 
 For comparison (scripts in the `alt` subdirectory):
 * decoding [1cjb MMTF file](http://mmtf.rcsb.org/v1.0/full/1cjb.mmtf.gz)
@@ -116,7 +107,7 @@ and interpreting their content as a structural model,
 which usually involves building a model-chain-residue-atom hierarchy.
 
 The scripts that are run are in the ``read-model`` subdirectory.
-They happen to all be Python scripts:
+They all happen to be Python scripts:
 
 * `gemmi-structure` - calls `gemmi.read_structure()` from Python.
   Internally, it first copies all the data into DOM structure, and then
@@ -130,6 +121,7 @@ They happen to all be Python scripts:
   [clipper-python](https://github.com/clipper-python/clipper-python)
 * `iotbx-pdb` - calls `iotbx.pdb.input()` from
   [cctbx/iotbx](https://cctbx.github.io/iotbx/)
+* `atomium` - calls `atomium.open()` from [atomium](github.com/samirelanduk/atomium)
 
 These benchmarks can be run only with coordinate files.
 Here I use only two of them: 1cjb.cif and 3j3q.cif:
@@ -139,11 +131,12 @@ Here I use only two of them: 1cjb.cif and 3j3q.cif:
 
 |       program         | 1cjb | mem  | 3j3q  |  mem  |
 | --------------------- | ---: | ---: | ----: | ----: |
-| `gemmi-structure`     | 0.03 |  22  |   3.8 | 2288  |
-| `biopython`           | 0.49 |  53  | 128.5 | 6655  |
-| `biopython-fast`      | 0.26 |  55  |  45.8 | 7512  |
-| `clipper-python`      | ERR  |      |  44.8 | 2353  |
-| `iotbx-pdb`           | 0.40 | 110  |  ERR  |       |
+| `gemmi-structure`     | 0.19 |  48  |  11.0 |  4085 |
+| `biopython`           | 0.55 |  53  | 138.8 |  6197 |
+| `biopython-fast`      | 0.35 |  55  |  67.0 |  6986 |
+| `clipper-python`      | ERR  |      |  55.6 |  2854 |
+| `iotbx-pdb`           | 0.43 | 119  |  ERR  |       |
+| `atomium`             | 0.85 |  96  | 108.5 | 10017 |
 
 The table reports elapsed time in seconds and peak memory in MB.
 
