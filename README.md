@@ -147,9 +147,7 @@ For comparison:
 
 Parsing small CIF files: https://github.com/cod-developers/CIF-parsers
 
-Parsing PDB files: https://github.com/jgreener64/pdb-benchmarks  
-(it doesn't include Gemmi, but parsing 1HTQ PDB file in Gemmi takes
-about 0.5s, it's 3-4x faster than parsing corresponding mmCIF file).
+Parsing PDB files: https://github.com/jgreener64/pdb-benchmarks
 
 ## Thoughts
 
